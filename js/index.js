@@ -392,22 +392,9 @@ function init() {
   }
   CheckButton.prototype.onEvent = function(){
     this.checkbox.onchange = e=>{
-      if (this.checkbox.checked === false){
-        // this.buferVal = JSON.parse(JSON.stringify(this.line.val));
-        // let anim = setInterval(()=>{
-        //   for (const i in this.line.val) {
-        //     this.line.val[i]=this.line.val[i] > 1 && this.line.val[i]/2 ;
-        //   }
-        //   if(Object.values(this.line.val).filter(e=>e>1).length === 0){
-        //     this.line.visible =false;
-        //     clearInterval(anim);
-        //   }
-        //   drawStuff();
-        // },20);   
+      if (this.checkbox.checked === false){  
         this.line.visible=false; 
       }else if(this.checkbox.checked ===true){
-        // this.line.val = JSON.parse(JSON.stringify(this.buferVal));
-        // this.line.val = this.buferVal;
         this.line.visible =true;
       }
       drawStuff();
@@ -480,7 +467,7 @@ function init() {
   let checkButtons = [];
 
   ajax_get('chart_data.json',data_input=>{
-    let data=data_input[4];
+    let data=data_input[0];
     let x,y=[];
     for (const props in data.types) {
       if (data.types.hasOwnProperty(props)) {
