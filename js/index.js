@@ -1,7 +1,8 @@
 "use strict"
-console.log('source:' + 'https://github.com/pavladan/pavladan.github.io');
 
 function init() {
+  console.log('source:' + 'https://github.com/pavladan/pavladan.github.io');
+  
   function ajax_get(url, callback) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function() {
