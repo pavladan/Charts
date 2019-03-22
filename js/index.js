@@ -1,4 +1,5 @@
 "use strict"
+console.log('source:' + 'https://github.com/pavladan/pavladan.github.io');
 
 function init() {
   function ajax_get(url, callback) {
