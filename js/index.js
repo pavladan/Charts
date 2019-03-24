@@ -86,6 +86,7 @@ function init() {
       cc.font = this.width > 300 ? "14px sans-serif" : "10px sans-serif";
       cc.fillText(date, lines[0].timeToPx(col)[0], this.height);
     }
+
   };
 
   Canvas.prototype.drawVerticalLine = function (currentX) {
@@ -186,13 +187,7 @@ function init() {
     }
   };
 
-  Canvas.prototype.approxim = function (eL) {
-    var mass = Object.keys(this.lines.filter(function (e) {
-      return e.visible === true;
-    })[0].val);
-    var value = this.lines.filter(function (e) {
-      return e.visible === true;
-    })[0].pxToTime(eL)[0];
+  Canvas.prototype.approxim = function (mass,value) {
     return mass.reduce(function (prev, curr) {
       return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
     });
@@ -225,8 +220,14 @@ function init() {
         _this3.clear();
 
         _this3.drawGrid();
-
-        var currentX = _this3.approxim(eL);
+        
+        var mass = Object.keys(_this3.lines.filter(function (e) {
+          return e.visible === true;
+        })[0].val);
+        var value = _this3.lines.filter(function (e) {
+          return e.visible === true;
+        })[0].pxToTime(eL)[0];
+        var currentX = _this3.approxim(mass,value);
 
         _this3.lines.forEach(function (line) {
           line.draw();
