@@ -1,8 +1,10 @@
-* { margin:0; padding:0; } 
+@import url(https://fonts.googleapis.com/css?family=Oxygen:400,700);
+* { margin:0; padding:0; box-sizing: border-box;} 
 html, body { width:100%;} 
 canvas { display:block; }
 body{
-  font-family: sans-serif;
+  overflow-x: hidden;
+  font-family: 'Oxygen', sans-serif;
 }
 .container{
   margin: 0 60px;
@@ -14,8 +16,9 @@ body{
     margin: 0 10px;
   }
 }
+
 h1{
-  padding:25px 0 0 0;
+  padding:50px 0 0 0;
 }
 canvas{
   margin: 0 0 25px 0;
@@ -83,4 +86,139 @@ li{
   .themeswitch{
     position: relative;
   }
+}
+
+.wrapper {
+  margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .wrapper {
+    width: 750px;
+  }
+}
+@media (min-width: 992px) {
+  .wrapper {
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+  .wrapper {
+    width: 1170px;
+  }
+}
+.burger {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 0;
+}
+.burger.open{
+  height: auto;
+}
+.burger__wrapper {
+  transition: all 0.4s linear;
+  background: rgba(150,162,170, 0.7);
+  transform: translateY(-200px);
+  z-index: 1049;
+}
+.burger__button {
+  display: block;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  text-align: center;
+  transition: all 0.5s ease;
+  z-index: 1050;
+}
+.burger__button__icon {
+  display: inline-block;
+  position: absolute;
+  background: #96a2aa;
+  margin: 0 auto;
+  width: 20px;
+  height: 2.5px;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transition: all 0.4s ease 0.1s;
+  transform: translateY(-1.25px);
+}
+.burger__button__icon:before,
+.burger__button__icon:after {
+  content: "";
+  position: absolute;
+  margin: 0 auto;
+  background: #96a2aa;
+  width: 20px;
+  height: 2.5px;
+  left: 0;
+  right: 0;
+  transition: all 0.4s ease 0.1s;
+}
+.burger__button__icon:before {
+  bottom: 8px;
+}
+.burger__button__icon:after {
+  top: 8px;
+}
+.burger__button.open .burger__button__icon {
+  background: transparent;
+}
+.burger__button.open .burger__button__icon:before,
+.burger__button.open .burger__button__icon:after {
+  background: #fff;
+  transform-origin: 0 50%;
+  width: 25.61249695px;
+}
+.burger__button.open:hover .burger__button__icon:before,
+.burger__button.open:hover .burger__button__icon:after {
+  background: #344658;
+}
+.burger__button.open .burger__button__icon:before {
+  transform: rotateZ(0.67474094rad);
+}
+.burger__button.open .burger__button__icon:after {
+  transform: rotateZ(-0.67474094rad);
+}
+.burger__menu {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 60px;
+}
+.burger__menu > li {
+  display: block;
+  flex: 1;
+  text-align: center;
+  position: relative;
+  margin: auto;
+}
+.burger__menu input{
+  display: none;
+}
+.burger__menu label {
+  display: block;
+  text-decoration: none;
+  color: #fff;
+  padding: 15px;
+  font-size: 1.25rem;
+  font-weight: normal;
+  padding-left: 0;
+  transition: all 0.4s ease;
+}
+.burger__menu label:hover {
+  color:#344658;
+  cursor: pointer;
+}
+.radioChart:checked ~ label{
+  color:#344658;
+}
+.burger__button.open + .burger__wrapper {
+  transform: translateY(0);
 }

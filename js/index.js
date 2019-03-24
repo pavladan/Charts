@@ -44,7 +44,10 @@ function init() {
     this.context.clearRect(0, 0, this.width, this.height);
   };
 
-  Canvas.prototype.drawGrid = function (lines) {
+  Canvas.prototype.drawGrid = function () {
+    var lines = this.lines.filter(function (e) {
+      return e.visible === true;
+    });
     var _this = this;
 
     var colRows = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 6;
@@ -85,7 +88,10 @@ function init() {
     }
   };
 
-  Canvas.prototype.drawVerticalLine = function (lines, currentX) {
+  Canvas.prototype.drawVerticalLine = function (currentX) {
+    var lines = this.lines.filter(function (e) {
+      return e.visible === true;
+    });
     var currentPX = lines[0].timeToPx(currentX)[0];
     var cc = this.context;
     var points = [];
@@ -110,7 +116,10 @@ function init() {
     });
   };
 
-  Canvas.prototype.drawStat = function (lines, currentX, e) {
+  Canvas.prototype.drawStat = function (currentX, e) {
+    var lines = this.lines.filter(function (e) {
+      return e.visible === true;
+    })
     var _this2 = this;
 
     var container = document.querySelector('.container');
@@ -177,13 +186,21 @@ function init() {
     }
   };
 
-  Canvas.prototype.approxim = function (mass, value) {
+  Canvas.prototype.approxim = function (eL) {
+    var mass = Object.keys(this.lines.filter(function (e) {
+      return e.visible === true;
+    })[0].val);
+    var value = this.lines.filter(function (e) {
+      return e.visible === true;
+    })[0].pxToTime(eL)[0];
     return mass.reduce(function (prev, curr) {
       return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
     });
   };
 
   Canvas.prototype.onGetValue = function (lines) {
+    this.lines = lines;
+    
     var _this3 = this;
 
     var counter = 0;
@@ -207,27 +224,17 @@ function init() {
       if (e.target === _this3.selector) {
         _this3.clear();
 
-        _this3.drawGrid(lines.filter(function (e) {
-          return e.visible === true;
-        }));
+        _this3.drawGrid();
 
-        var currentX = _this3.approxim(Object.keys(lines.filter(function (e) {
-          return e.visible === true;
-        })[0].val), lines.filter(function (e) {
-          return e.visible === true;
-        })[0].pxToTime(eL)[0]);
+        var currentX = _this3.approxim(eL);
 
-        lines.forEach(function (line) {
+        _this3.lines.forEach(function (line) {
           line.draw();
         });
 
-        _this3.drawVerticalLine(lines.filter(function (e) {
-          return e.visible === true;
-        }), currentX);
+        _this3.drawVerticalLine(currentX);
 
-        _this3.drawStat(lines.filter(function (e) {
-          return e.visible === true;
-        }), currentX, newE);
+        _this3.drawStat(currentX, newE);
 
         counter++;
       } else if ((e.path || e.composedPath && e.composedPath()).filter(function (e) {
@@ -235,12 +242,10 @@ function init() {
       }).length === 0 && counter > 0) {
         _this3.clear();
 
-        _this3.drawGrid(lines.filter(function (e) {
-          return e.visible === true;
-        }));
+        _this3.drawGrid();
 
-        lines.forEach(function (line) {
-          line.draw();
+        _this3.lines.forEach(function (line) {
+           line.draw();
         });
         counter = 0;
       }
@@ -249,7 +254,6 @@ function init() {
     document.onmousemove = moveEvent;
     document.ontouchmove = moveEvent;
   };
-
   function Line(canvas, val, name, color, lineWidth, isVisible) {
     this.canvas = canvas;
     this.val = val;
@@ -314,7 +318,7 @@ function init() {
     this.canvas = canvas;
     this.x1 = x1;
     this.x2 = x2;
-    this.sideWidth = 10;
+    this.sideWidth = 12;
     this.lineWidth = 2;
     this.minWidth = 10;
     this.theme = theme;
@@ -495,7 +499,10 @@ function init() {
     this.init(theme);
     this.onEvent();
   }
-
+  CheckButton.prototype.delete=function(){
+    this.checkbox.parentElement.removeChild(this.checkbox);
+    this.label.parentElement.removeChild(this.label);
+  }
   CheckButton.prototype.init = function (theme) {
     this.checkbox = document.createElement('input');
     this.checkbox.type = "checkbox";
@@ -514,17 +521,14 @@ function init() {
     this.parent.appendChild(this.checkbox);
     this.parent.appendChild(this.label);
   };
-
   CheckButton.prototype.onEvent = function () {
     var _this6 = this;
-
     this.checkbox.onchange = function (e) {
       if (_this6.checkbox.checked === false) {
         _this6.line.visible = false;
       } else if (_this6.checkbox.checked === true) {
         _this6.line.visible = true;
       }
-
       drawStuff();
     };
   };
@@ -562,7 +566,68 @@ function init() {
       drawStuff();
     };
   }
-
+  
+  function changeRadio (){
+    var data = charts[document.querySelector('.radioChart:checked').value];
+    var x, y = [];
+    preLines = [];
+    fullLines=[];
+    checkButtons.forEach(e=>e.delete());
+    checkButtons=[];
+    for (var props in data.types) {
+      if (data.types.hasOwnProperty(props)) {
+        var value = data.types[props];
+        if (value === 'line') y.push(props);
+        if (value === 'x') x = props;
+      }
+    }
+    y.forEach(function (y_one) {
+      var val = {};
+      var arr_x = data.columns.filter(function (e) {
+        return e[0] === x;
+      })[0].filter(function (e, index) {
+        return index !== 0;
+      });
+      var arr_y = data.columns.filter(function (e) {
+        return e[0] === y_one;
+      })[0].filter(function (e, index) {
+        return index !== 0;
+      });
+      for (var i = 0; i < arr_x.length; i++) {
+        val[arr_x[i]] = arr_y[i];
+      }
+      preLines.push(new Line(preView, val, data.names[y_one], data.colors[y_one], 1.5));
+    });
+    preLines.forEach(function (line) {
+      return line.setLineParameters(preLines, 5);
+    });
+    preLines.forEach(function (line) {
+      return line.setLineParameters(preLines, 5);
+    });
+    preLines.forEach(function (line) {
+      return fullLines.push(new Line(fullView, function () {
+        var vals = {};
+        for (var key in line.val) {
+          if (line.val.hasOwnProperty(key)) {
+            var element = line.val[key];
+            key >= line.pxToTime(visibleField.x1)[0] && key <= line.pxToTime(visibleField.x2)[0] ? vals[key] = element : null;
+          }
+        }
+        return vals;
+      }(), line.name, line.color, 2.5));
+    });
+    fullLines.forEach(function (line) {
+      return line.setLineParameters(fullLines, 25);
+    });
+    fullView.onGetValue(fullLines);
+    preLines.forEach(function (e) {
+      checkButtons.push(new CheckButton(document.querySelector('#check-block'), e, theme));
+    });
+    drawStuff();
+    document.querySelector('.burger').classList.remove("open");
+    document.getElementById("burger-button").classList.remove("open");
+  }
+  var charts;
   var selectorFullView = document.querySelector('canvas#full-view');
   var selectorPreView = document.querySelector('canvas#pre-view');
   var theme = new Theme(document.querySelector('.themeswitch-btn'), 'Switch to Night Mode', 'Switch to Day mode');
@@ -573,6 +638,13 @@ function init() {
   var fullLines = [];
   var visibleField = undefined;
   window.addEventListener('resize', resizeCanvas, false);
+
+  var burger = document.getElementById("burger-button");
+  burger.addEventListener("click", function (e) {
+    e.preventDefault();
+    document.querySelector('.burger').classList.toggle("open");
+    burger.classList.toggle("open");
+  });
 
   function resizeCanvas() {
     containerWidth = document.querySelector('.container').offsetWidth;
@@ -599,65 +671,32 @@ function init() {
 
   resizeCanvas();
   visibleField = new VisibleField(preView, preView.width * 0.7, preView.width, theme);
+  
   var checkButtons = [];
   ajax_get('chart_data.json', function (data_input) {
-    var data = data_input[0];
-    var x,
-        y = [];
-
-    for (var props in data.types) {
-      if (data.types.hasOwnProperty(props)) {
-        var value = data.types[props];
-        if (value === 'line') y.push(props);
-        if (value === 'x') x = props;
+    charts = data_input;
+    for (const i in charts) {
+      if (charts.hasOwnProperty(i)) {
+        let li = document.createElement('li');
+        let input = document.createElement('input');
+        input.type='radio';
+        input.id = 'radio'+i;
+        input.name = 'charts';
+        input.value = i;
+        input.checked = i == 0 ? true : false;
+        input.className ='radioChart';
+        let label = document.createElement('label');
+        label.htmlFor = input.id;
+        label.innerText = i;
+        li.appendChild(input);
+        li.appendChild(label);
+        document.querySelector('.burger__menu').appendChild(li);
+        input.onchange = changeRadio;
       }
     }
-
-    y.forEach(function (y_one) {
-      var val = {};
-      var arr_x = data.columns.filter(function (e) {
-        return e[0] === x;
-      })[0].filter(function (e, index) {
-        return index !== 0;
-      });
-      var arr_y = data.columns.filter(function (e) {
-        return e[0] === y_one;
-      })[0].filter(function (e, index) {
-        return index !== 0;
-      });
-
-      for (var i = 0; i < arr_x.length; i++) {
-        val[arr_x[i]] = arr_y[i];
-      }
-
-      preLines.push(new Line(preView, val, data.names[y_one], data.colors[y_one], 1.5));
-    });
-    preLines.forEach(function (line) {
-      return line.setLineParameters(preLines, 5);
-    });
-    preLines.forEach(function (line) {
-      return fullLines.push(new Line(fullView, function () {
-        var vals = {};
-
-        for (var key in line.val) {
-          if (line.val.hasOwnProperty(key)) {
-            var element = line.val[key];
-            key >= line.pxToTime(visibleField.x1)[0] && key <= line.pxToTime(visibleField.x2)[0] ? vals[key] = element : null;
-          }
-        }
-
-        return vals;
-      }(), line.name, line.color, 2.5));
-    });
-    fullLines.forEach(function (line) {
-      return line.setLineParameters(fullLines, 25);
-    });
+    changeRadio();
     visibleField.onEvent();
-    fullView.onGetValue(fullLines);
-    preLines.forEach(function (e) {
-      checkButtons.push(new CheckButton(document.querySelector('#check-block'), e, theme));
-    });
-    drawStuff();
+    
   });
 
   function drawStuff() {
@@ -692,9 +731,7 @@ function init() {
 
       e.draw();
     });
-    fullView.drawGrid(fullLines.filter(function (e) {
-      return e.visible === true;
-    }));
+    fullView.drawGrid();
   }
 }
 
