@@ -556,6 +556,7 @@ function init() {
       selector.innerText = _this7.state === 'day' ? textDay : textNight;
       document.body.style.color = _this7.state === 'day' ? _this7.colorDay.text : _this7.colorNight.text;
       document.body.style.backgroundColor = _this7.state === 'day' ? _this7.colorDay.bgc : _this7.colorNight.bgc;
+      document.querySelector('.burger__wrapper').style.background = _this7.state === 'day' ? _this7.colorDay.visibleField : _this7.colorNight.visibleField;
     };
 
     eventChange();
